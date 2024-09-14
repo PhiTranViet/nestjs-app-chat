@@ -58,9 +58,111 @@ Tech: SocketIO, Nestjs, Docker, Redis, Postgresql, and anything else you can use
 ## Getting Started
 
 ### 1. Clone the Repository
+
+git clone https://github.com/PhiTranViet/project-app.git
+cd project-app
+
 ### 2. Environment Configuration
+Create a .env file in the project root directory and add the following variables:
+# PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=chat_app
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# App
+APP_PORT=3000
+
+
 ### 3. Running with Docker
+
+Step 1: Build and Run Containers
+
+The project includes a docker-compose.yml file to easily set up PostgreSQL, Redis, and the NestJS application. Run the following command:
+docker-compose up --build
+
+This will start the application on http://localhost:3000 and expose the following services:
+
+	•	API: http://localhost:3000
+	•	Swagger API Documentation: http://localhost:3000/docs
+	•	PostgreSQL: localhost:5432
+	•	Redis: localhost:6379
+
+Step 2: Database Initialization
+
+Once the containers are up, the application will automatically initialize the database using TypeORM, and any new changes will be synchronized.
+
+
 ### 4. Running Without Docker
+
+If you want to run the application manually without Docker, follow these steps:
+
+Step 1: Install Dependencies
+
+Make sure you have PostgreSQL and Redis running locally. Then, install the dependencies:
+
+npm install
+
+Step 2: Configure PostgreSQL and Redis
+
+Ensure that PostgreSQL and Redis are running and configured properly according to the values in your .env file.
+
+Step 3: Run the Application
+
+npm run start
+
+The application will start on http://localhost:3000, and you can access the Swagger API documentation at http://localhost:3000/docs.
+
+
+
+API Endpoints
+
+Authentication
+
+	•	POST /auth/login: Log in and receive a JWT token.
+	•	POST /auth/register: Register a new user.
+
+Users
+
+	•	GET /users: Get a list of all users.
+	•	GET /users/:id: Get a specific user by ID.
+	•	PUT /users/:id: Update user information.
+	•	DELETE /users/:id: Delete a user.
+
+Posts
+
+	•	POST /posts: Create a new post.
+	•	GET /posts: Get a list of posts.
+
+Chat
+
+	•	POST /chat/group: Create a group chat.
+	•	POST /chat/message: Send a message in a chat.
+	•	GET /chat/:id: Get chat messages by chat ID.
+
+Swagger Documentation
+
+The Swagger documentation is available at:
+http://localhost:3000/docs
+
+
+Technologies Used
+
+	•	NestJS: A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
+	•	PostgreSQL: Relational database for storing user and chat data.
+	•	Redis: In-memory data structure store used for caching and pub/sub messaging.
+	•	Socket.IO: Real-time, bidirectional event-based communication.
+	•	TypeORM: ORM used for database interaction and synchronization.
+	•	Docker: Used for containerization to run the app and its services.
+
 
 
 
