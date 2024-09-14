@@ -18,8 +18,8 @@ export class User {
   @Column({ name: 'password', type: 'varchar', length: 255, nullable: false, default: '' })
   public password: string;
 
-  @Column({name: 'token', type: 'varchar', length: 255, nullable: true})
-  public token: string;
+  @Column({name: 'refresh_token', type: 'varchar', length: 255, nullable: true})
+  public refreshToken: string;
 
   @Column({ name: 'created_at', type: 'bigint', nullable: true })
   public createdAt: number;

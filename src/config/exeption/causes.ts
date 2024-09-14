@@ -7,6 +7,12 @@ export class Causes {
     HttpStatus.INTERNAL_SERVER_ERROR,
   );
 
+
+  public static INVALID_REFRESH_TOKEN = new I18nException(
+    "error.INVALID_REFRESH_TOKEN",
+    HttpStatus.INTERNAL_SERVER_ERROR,
+  );
+
   public static JWT_EXPIRED = new I18nException(
     "error.JWT_EXPIRED",
     HttpStatus.UNAUTHORIZED,
