@@ -26,6 +26,45 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+
+# Chat Application API
+
+This is a basic chat application backend built with **NestJS**, **PostgreSQL**, **Socket.IO**, and **Redis**. It includes user authentication, post creation, and a chat module supporting 1-1 and group chats. Swagger is used for API documentation.
+
+/* 
+  Topic: Create a new project
+
+  - Basic authentication
+  - Create a post, view the post list
+  - Create a chat module (1-1, group)
+  - Using Swagger to view the API list
+*/
+Tech: SocketIO, Nestjs, Docker, Redis, Postgresql, and anything else you can use. 
+## Features
+
+- **Authentication**: JWT-based authentication for users.
+- **Post Management**: Users can create posts and view the list of posts.
+- **Chat Module**: 1-1 and group chats powered by Socket.IO.
+- **API Documentation**: Swagger integrated for easy API exploration.
+
+## Requirements
+
+- Node.js (>= v16.x)
+- Docker & Docker Compose (if using Docker)
+- PostgreSQL (if running manually)
+- Redis (if running manually)
+
+
+## Getting Started
+
+### 1. Clone the Repository
+### 2. Environment Configuration
+### 3. Running with Docker
+### 4. Running Without Docker
+
+
+
+
 ## Project setup
 
 ```bash
@@ -76,9 +115,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - PhiTran
+- Email - phitranviet99@gmail.com
+- Linkedin - [(https://www.linkedin.com/in/phitrantech/)]
 
 ## License
 
