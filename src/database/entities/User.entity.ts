@@ -1,7 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
-import { nowInMillis } from '../../shared/Utils'
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, Index } from 'typeorm';
+import { nowInMillis } from '../../shared/Utils';
 
 @Entity('users')
+@Index('usr_email', ['email'], { unique: true })
+@Index('usr_username', ['username'], { unique: false })
 
 export class User {
   @PrimaryGeneratedColumn({ name: 'id', type: 'bigint' })

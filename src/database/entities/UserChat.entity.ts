@@ -1,22 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, Index } from 'typeorm';
 import { nowInMillis } from '../../shared/Utils';
 
-@Entity('posts')
-@Index('pos_author_id', ['authorId'], { unique: false })
-@Index('pos_title', ['title'], { unique: false })
+@Entity('users_chats')
+@Index('idx_usr_chs',['userId', 'chatId'], { unique: true })
 
-export class Post {
+export class UserChat {
   @PrimaryGeneratedColumn({ name: 'id', type: 'bigint' })
   public id: number;
 
-  @Column({ name: 'title', type: 'varchar', length: 255 })
-  public title: string;
+  @Column({ name: 'user_id', type: 'bigint' })
+  public userId: number;
 
-  @Column({ name: 'content', type: 'text', nullable: true })
-  public content: string;
-
-  @Column({ name: 'author_id', type: 'bigint' })
-  public authorId: number;
+  @Column({ name: 'chat_id', type: 'bigint' })
+  public chatId: number;
 
   @Column({ name: 'created_at', type: 'bigint', nullable: true })
   public createdAt: number;
