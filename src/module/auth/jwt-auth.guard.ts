@@ -24,7 +24,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
 
       const user = this.jwtService.decode(token.split(' ')[1]);
-      console.log('User:', user);
       if (!user || !user['username']) return resolve(false);
 
       const userDB = await this.authService.getUserByUsername(user['username']);

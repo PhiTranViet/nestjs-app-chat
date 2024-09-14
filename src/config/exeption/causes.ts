@@ -30,6 +30,12 @@ export class Causes {
   );
 
 
+  public static NOT_AUTH = new I18nException(
+    "error.NOT_AUTH",
+    HttpStatus.BAD_REQUEST,
+  );
+
+
   public static EMAIL_OR_PASSWORD_INVALID = new I18nException(
     "error.EMAIL_OR_PASSWORD_INVALID",
     HttpStatus.UNAUTHORIZED,

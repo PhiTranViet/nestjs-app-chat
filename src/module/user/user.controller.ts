@@ -47,7 +47,7 @@ export class UserController {
     return await this.userService.getListUser(paginationOptions, query);
   }
 
-  @Get('item/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Get a user', description: 'Get a user' })
   @ApiCommonResponses()
   async getUser(@Param('id') id: string): Promise<User> {

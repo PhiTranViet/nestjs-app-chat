@@ -97,6 +97,28 @@ export function getArrayPagination<T>(
   return new Pagination(selectedItems, pagination, null);
 }
 
+export function getArrayPaginationBuildTotal<T>(
+  totalItems: any[],
+  totalData: any[],
+  options: any
+): Pagination<T> {
+  const { limit, page } = options;
+  const selectedItems = totalItems;
+  let totalRecord = 0
+  if (totalData.length > 0) {
+    totalRecord = totalData[0].total;
+  }
+  const pagination = {
+    totalItems: Number(totalRecord),
+    itemCount: Number(totalRecord),
+    itemsPerPage: Number(limit),
+    totalPages: Math.ceil(Number(totalRecord) / limit),
+    currentPage: Number(page),
+  };
+
+  return new Pagination(selectedItems, pagination, null);
+}
+
 
 
 export function requireParams(params: any, keys: string[]) {

@@ -1,56 +1,86 @@
 import { Injectable } from '@nestjs/common';
+import * as argon2 from 'argon2';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from "typeorm";
+import { Repository } from 'typeorm';
 import { User } from '../../database/entities';
 import { CreateUserDto } from './request/create-user.dto';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import {
   getArrayPagination,
-} from "../../shared/Utils";
+  getArrayPaginationBuildTotal,
+} from '../../shared/Utils';
 import { Causes } from '../../config/exeption/causes';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
-
   async findById(userId: number): Promise<User> {
-    // Find user by ID
-    return await this.userRepository.findOne({ where: { id: Number(userId) } });
+    return await this.usersRepository.findOne({
+      where: { id: Number(userId) },
+    });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const { username, password } = createUserDto;
+  async create(createUserDto: CreateUserDto) {
+    const { email, password } = createUserDto;
+    const hashedPassword = await argon2.hash(password);
 
-    // Hash password before saving to database
-
-    const user = this.userRepository.create({
-      username,
-      password: password,
+    const user = this.usersRepository.create({
+      username: email,
+      email: email,
+      password: hashedPassword,
     });
 
-    return this.userRepository.save(user);
+    await this.usersRepository.save(user);
+    return {
+      email: user.email,
+    };
   }
 
-  async getListUser( paginationOptions: IPaginationOptions, data){
-    const { limit, page } = paginationOptions;
+  async getListUser(paginationOptions: IPaginationOptions, data) {
+    const queryBuilder = this.usersRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id as id',
+        'user.username as username',
+        'user.email as email',
+        'user.created_at as createdAt',
+        'user.updated_at as updatedAt',
+      ]);
 
-    const whereCondition: any = {};
+    const queryCount = this.usersRepository
+      .createQueryBuilder('user')
+      .select('Count (1) as total');
     if (data.username) {
-      whereCondition.username = data.username;
+      queryBuilder.andWhere('user.username LIKE :username', {
+        username: `%${data.username}%`,
+      });
+
+      queryCount.andWhere('user.username LIKE :username', {
+        username: `%${data.username}%`,
+      });
     }
     if (data.email) {
-      whereCondition.email = data.email;
+      queryBuilder.andWhere('user.email LIKE :email', {
+        email: `%${data.email}%`,
+      });
+
+      queryCount.andWhere('user.email LIKE :email', {
+        email: `%${data.email}%`,
+      });
     }
 
-    const [users, total] = await this.userRepository.findAndCount({
-      where: whereCondition,
-      skip: (Number(page) - 1) * Number(limit),
-      take: Number(limit),
-    });
-    const { items, meta } = getArrayPagination<User>(users, total, paginationOptions);
+    const users = await queryBuilder.execute();
+    const usersCountList = await queryCount.execute();
+
+    const { items, meta } = getArrayPaginationBuildTotal<User>(
+      users,
+      usersCountList,
+      paginationOptions,
+    );
+
     return {
       results: items,
       pagination: meta,
@@ -58,7 +88,9 @@ export class UserService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: Number(id) } });
+    const user = await this.usersRepository.findOne({
+      where: { id: Number(id) },
+    });
     if (!user) {
       throw Causes.INTERNAL_ERROR;
     }

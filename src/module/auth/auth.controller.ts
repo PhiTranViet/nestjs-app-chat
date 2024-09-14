@@ -6,6 +6,7 @@ import {
   Req,
   UseGuards,
   HttpStatus,
+  Version
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EmptyObjectBase } from '../../shared/response/emptyObjectBase.dto';
@@ -21,18 +22,14 @@ import { ResetPassword } from './request/reset-password.dto';
 import { RefreshTokenDto } from './request/refresh-token.dto';
 import RequestWithUser from '../../database/interfaces/requestWithUser.interface';
 import { Causes } from '../../config/exeption/causes';
-import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Post('/register')
   @ApiOperation({
@@ -156,7 +153,6 @@ export class AuthController {
     description: 'Info user',
   })
   async getInfoUser(@Req() request: RequestWithUser) {
-    console.log('request.user',request.user);
     if (!request || !request.user) throw Causes.DATA_INVALID;
 
     const user = await this.authService.getUserByUsername(

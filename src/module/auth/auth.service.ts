@@ -132,20 +132,6 @@ export class AuthService {
     };
   }
 
-  async login1(user: any): Promise<LoginResponse> {
-    const payload = { username: user.username, userId: user.id };
-    const tokenLogin = this.jwtService.sign(payload);
-
-    // this.setValidToken(tokenLogin);
-
-    const { password, token, ...dataReturn } = user;
-
-    return {
-      ...dataReturn,
-      token: tokenLogin,
-    };
-  }
-
   async updatePassword(user: User, data: any) {
     if (!user || !user.username || !data) return false;
     let dataUser = await this.getUserByUsername(user.username);
