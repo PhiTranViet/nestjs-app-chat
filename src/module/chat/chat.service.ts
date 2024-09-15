@@ -35,8 +35,7 @@ export class ChatService {
     @InjectRepository(UserGroup)
     private usersGroupsRepository: Repository<UserGroup>,
 
-    private readonly rabbitMQService: RabbitMQService
-
+    private readonly rabbitMQService: RabbitMQService,
   ) {}
 
   async createChat(
@@ -74,6 +73,7 @@ export class ChatService {
     const userChats = await this.usersChatsRepository.find({
       where: { chatId },
     });
+
     const messages = userChats.map((userChat) => {
       return this.messagesRepository.create({
         chatId: chat.id,
@@ -85,17 +85,14 @@ export class ChatService {
         sentAt: Date.now(),
       });
     });
-    await this.rabbitMQService.sendToQueue('chat', messages);
 
-    // await this.rabbitMQService.consumeQueue('chat_queue', (msg) => {
-    //   if (msg) {
-    //     const message = JSON.parse(msg.content.toString());
-    //     console.log('Received message:', message);
-    //     this.rabbitMQService.channel.ack(msg);
-    //   }
-    // });
+    const messagesToQueue = messages.filter((message) => !message.isSender);
+    if (messagesToQueue.length > 0) {
+      await this.rabbitMQService.sendToQueue('chat', messagesToQueue);
+    }
+
     await this.messagesRepository.save(messages);
-    return messages[0];
+    return messages.find((message) => message.isSender);
   }
 
   async getMessagesByChat(paginationOptions: IPaginationOptions, data: any) {
@@ -172,16 +169,19 @@ export class ChatService {
     return message;
   }
 
-  async markAllMessagesAsRead(chatId: number, userId: number): Promise<Message[]> {
+  async markAllMessagesAsRead(
+    chatId: number,
+    userId: number,
+  ): Promise<Message[]> {
     const messages = await this.messagesRepository.find({
-      where: { chatId, status: 'sent', userId: userId   }, // Only mark messages that are 'sent'
+      where: { chatId, status: 'sent', userId: userId }, // Only mark messages that are 'sent'
     });
 
     if (!messages.length) {
       throw Causes.DATA_INVALID;
     }
 
-    messages.forEach(message => {
+    messages.forEach((message) => {
       message.status = 'read';
       message.seenAt = Date.now();
     });
@@ -190,5 +190,4 @@ export class ChatService {
 
     return messages;
   }
-
 }

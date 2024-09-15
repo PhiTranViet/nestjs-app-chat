@@ -30,7 +30,7 @@ export class WorkerService implements OnModuleInit {
 
     await this.notificationService.sendNotification(
       message.userId,
-      message.content,
+      message,
     );
   }
 
@@ -41,7 +41,7 @@ export class WorkerService implements OnModuleInit {
 
     await this.notificationService.sendNotification(
       message.userId,
-      message.content,
+      message,
     );
   }
 }

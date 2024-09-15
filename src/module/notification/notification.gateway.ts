@@ -13,9 +13,8 @@ export class NotificationGateway {
     console.log(`Client ${client.id} joined room ${roomName}`);
   }
 
-  sendNotification(userId: number, message: string) {
-    // this.server.to(`user_${userId}`).emit('notification', message);
-    this.server.to(`user_1`).emit('notification', message);
+  sendNotification(userId: number, message: any) {
+    this.server.to(`user_${userId}`).emit('notification', message);
   }
 
   handleConnection(client: any) {

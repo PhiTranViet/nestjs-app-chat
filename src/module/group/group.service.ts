@@ -37,8 +37,7 @@ export class GroupService {
     @InjectRepository(UserGroup)
     private usersGroupsRepository: Repository<UserGroup>,
 
-    private readonly rabbitMQService: RabbitMQService
-
+    private readonly rabbitMQService: RabbitMQService,
   ) {}
 
   async createGroupChat(createGroupDto: CreateGroupDto): Promise<Group> {
@@ -96,11 +95,14 @@ export class GroupService {
       });
     });
 
-    await this.rabbitMQService.sendToQueue('group', messages);
-
     await this.messagesRepository.save(messages);
 
-    return messages[0];
+    const messagesToQueue = messages.filter((message) => !message.isSender);
+    if (messagesToQueue.length > 0) {
+      await this.rabbitMQService.sendToQueue('group', messagesToQueue);
+    }
+
+    return messages.find((message) => message.isSender);
   }
 
   async getMembersInGroup(paginationOptions: IPaginationOptions, data: any) {
@@ -325,8 +327,6 @@ export class GroupService {
     return true;
   }
 
-
-
   async markMessageAsRead(messageId: number, userId: number): Promise<Message> {
     const message = await this.messagesRepository.findOne({
       where: { id: messageId, userId: userId },
@@ -343,16 +343,19 @@ export class GroupService {
     return message;
   }
 
-  async markAllMessagesAsRead(groupId: number, userId: number): Promise<Message[]> {
+  async markAllMessagesAsRead(
+    groupId: number,
+    userId: number,
+  ): Promise<Message[]> {
     const messages = await this.messagesRepository.find({
-      where: { groupId, status: 'sent', userId: userId   }, // Only mark messages that are 'sent'
+      where: { groupId, status: 'sent', userId: userId }, // Only mark messages that are 'sent'
     });
 
     if (!messages.length) {
       throw Causes.DATA_INVALID;
     }
 
-    messages.forEach(message => {
+    messages.forEach((message) => {
       message.status = 'read';
       message.seenAt = Date.now();
     });
