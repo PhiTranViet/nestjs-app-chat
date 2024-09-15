@@ -59,7 +59,7 @@ export class ChatController {
     type: EmptyObjectBase,
   })
   async sendMessage(
-    @Param('chatId', ParseIntPipe) chatId: number,
+    @Param('chatId') chatId: number,
     @Body() sendMessageDto: SendMessageDto,
     @Req() request: any,
   ) {
@@ -76,7 +76,7 @@ export class ChatController {
     type: PaginatedtDto,
   })
   async getMessagesByChat(
-    @Param('chatId', ParseIntPipe) chatId: number,
+    @Param('chatId') chatId: number,
     @Query() query: PaginatedtDto,
     @Req() request: any,
   ) {
@@ -100,7 +100,7 @@ export class ChatController {
     description: 'Delete chat successfully',
   })
   async deleteGroup(
-    @Param('chatId', ParseIntPipe) chatId: number,
+    @Param('chatId') chatId: number,
     @Req() request: any,
   ) {
     return this.chatService.deleteChat(chatId);
@@ -114,7 +114,7 @@ export class ChatController {
     description: 'Message marked as read',
   })
   async markMessageAsRead(
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('messageId') messageId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;
@@ -129,7 +129,7 @@ export class ChatController {
     description: 'All messages in the chat marked as read',
   })
   async markAllMessagesAsRead(
-    @Param('chatId', ParseIntPipe) chatId: number,
+    @Param('chatId') chatId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;

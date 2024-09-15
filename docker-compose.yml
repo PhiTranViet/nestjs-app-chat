@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     image: postgres:13
@@ -22,25 +21,47 @@ services:
     networks:
       - app-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # Port cho RabbitMQ
+      - "15672:15672" # Port cho RabbitMQ Management Console
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: nest-app
     ports:
-      - "3000:3000"
+      - "3003:3002"
     depends_on:
       - postgres
       - redis
+      - rabbitmq
     environment:
+      PORT: 3002
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: password123
       DB_NAME: chat_app
+      SECRET_KEY: somesercretkey
+      JWT_SECRET: somesercretkey
+      JWT_EXPIRED: 15m
+      JWT_REFRESH_EXPIRED: 7d
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: mysecretkey
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
     volumes:
       - .:/usr/src/app
     networks:
@@ -49,6 +70,7 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:
 
 networks:
   app-network:

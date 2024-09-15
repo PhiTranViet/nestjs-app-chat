@@ -4,14 +4,14 @@ import {IsEmail, IsNotEmpty} from 'class-validator';
 export class Login {
     @ApiProperty({
         type: String,
-        example: 'example@gmail.com'
+        example: 'dev@gmail.com'
     })
     @IsEmail()
     email: string;
 
     @ApiProperty({
         type: String,
-        example: 'password'
+        example: '12345678@Abc'
     })
     @IsNotEmpty()
     password: string;

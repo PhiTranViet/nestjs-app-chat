@@ -91,8 +91,8 @@ docker-compose up --build
 
 This will start the application on http://localhost:3000 and expose the following services:
 
-	•	API: http://localhost:3000
-	•	Swagger API Documentation: http://localhost:3000/docs
+	•	API: http://localhost:3003
+	•	Swagger API Documentation: http://localhost:3003/api-docs
 	•	PostgreSQL: localhost:5432
 	•	Redis: localhost:6379
 

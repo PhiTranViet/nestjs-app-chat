@@ -15,6 +15,7 @@ import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { getArrayPaginationBuildTotal } from '../../shared/Utils';
 import { CreateChatDto } from './request/create-chat.dto';
 import { SendMessageDto } from './request/send-message.dto';
+import { RabbitMQService } from '../common/rabbitmq/rabbitmq.service';
 
 @Injectable()
 export class ChatService {
@@ -33,6 +34,9 @@ export class ChatService {
 
     @InjectRepository(UserGroup)
     private usersGroupsRepository: Repository<UserGroup>,
+
+    private readonly rabbitMQService: RabbitMQService
+
   ) {}
 
   async createChat(
@@ -63,7 +67,6 @@ export class ChatService {
     sendMessageDto: SendMessageDto,
   ): Promise<Message> {
     const chat = await this.chatsRepository.findOne({ where: { id: chatId } });
-
     if (!chat) {
       throw Causes.DATA_INVALID;
     }
@@ -71,7 +74,6 @@ export class ChatService {
     const userChats = await this.usersChatsRepository.find({
       where: { chatId },
     });
-
     const messages = userChats.map((userChat) => {
       return this.messagesRepository.create({
         chatId: chat.id,
@@ -83,7 +85,15 @@ export class ChatService {
         sentAt: Date.now(),
       });
     });
+    await this.rabbitMQService.sendToQueue('chat', messages);
 
+    // await this.rabbitMQService.consumeQueue('chat_queue', (msg) => {
+    //   if (msg) {
+    //     const message = JSON.parse(msg.content.toString());
+    //     console.log('Received message:', message);
+    //     this.rabbitMQService.channel.ack(msg);
+    //   }
+    // });
     await this.messagesRepository.save(messages);
     return messages[0];
   }

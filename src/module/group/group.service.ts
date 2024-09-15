@@ -17,6 +17,7 @@ import { CreateGroupDto } from './request/create-group.dto';
 import { SendMessageDto } from './request/send-message.dto';
 import { AddMemberToGroupDto } from './request/add-member-to-group.dto';
 import { UpdateGroupDto } from './request/update-group.dto';
+import { RabbitMQService } from '../common/rabbitmq/rabbitmq.service';
 
 @Injectable()
 export class GroupService {
@@ -35,6 +36,9 @@ export class GroupService {
 
     @InjectRepository(UserGroup)
     private usersGroupsRepository: Repository<UserGroup>,
+
+    private readonly rabbitMQService: RabbitMQService
+
   ) {}
 
   async createGroupChat(createGroupDto: CreateGroupDto): Promise<Group> {
@@ -91,6 +95,8 @@ export class GroupService {
         sentAt: Date.now(),
       });
     });
+
+    await this.rabbitMQService.sendToQueue('group', messages);
 
     await this.messagesRepository.save(messages);
 

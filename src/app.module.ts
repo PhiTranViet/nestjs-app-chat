@@ -8,6 +8,8 @@ import { ChatModule } from './module/chat/chat.module';
 import { NotificationModule } from './module/notification/notification.module';
 import { GroupGateway } from './module/group/group.gateway';
 import { GroupModule } from './module/group/group.module';
+import { WorkerService } from './module/worker/worker.service';
+import { RabbitMQModule } from './module/common/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -21,8 +23,8 @@ import { GroupModule } from './module/group/group.module';
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, 
-    }), AuthModule, PostModule, UserModule, ChatModule, NotificationModule, GroupModule,
+    }), AuthModule, PostModule, UserModule, ChatModule, NotificationModule, GroupModule,RabbitMQModule
   ],
-  providers: [GroupGateway],
+  providers: [GroupGateway,WorkerService],
 })
 export class AppModule {}

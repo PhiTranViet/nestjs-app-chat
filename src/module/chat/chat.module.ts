@@ -14,6 +14,8 @@ import {
 } from '../../database/entities';
 import { AuthService } from '../auth/auth.service';
 import { AuthModule } from '../auth/auth.module';
+import { RabbitMQModule } from '../common/rabbitmq/rabbitmq.module';
+
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { AuthModule } from '../auth/auth.module';
       UserGroup,
     ]),
     AuthModule,
+    RabbitMQModule
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway, AuthService],

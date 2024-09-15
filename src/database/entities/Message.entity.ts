@@ -2,8 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, Ind
 import { nowInMillis } from '../../shared/Utils';
 
 @Entity('messages')
-@Index('ms_chat_id_created_at',['chatId', 'createdAt'], { unique: true })
-@Index('ms_group_id_created_at',['groupId', 'createdAt'], { unique: true })
+@Index('ms_chat_id_created_at',['chatId', 'createdAt'], { unique: false })
+@Index('ms_group_id_created_at',['groupId', 'createdAt'], { unique: false })
 @Index('ms_user_id',['userId'], { unique: false })         
 @Index('ms_type_created_at',['type', 'createdAt'], { unique: false })
 export class Message {

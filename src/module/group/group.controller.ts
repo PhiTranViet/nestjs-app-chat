@@ -62,7 +62,7 @@ export class GroupController {
     type: EmptyObjectBase,
   })
   async sendMessage(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Body() sendMessageDto: SendMessageDto,
     @Req() request: any,
   ) {
@@ -83,7 +83,7 @@ export class GroupController {
     type: PaginatedtDto,
   })
   async getGroupMembers(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Query() query: PaginatedtDto,
   ) {
     const paginationOptions = {
@@ -102,7 +102,7 @@ export class GroupController {
     type: PaginatedtDto,
   })
   async getGroupMessages(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Query() query: PaginatedtDto,
     @Req() request: any,
   ) {
@@ -127,7 +127,7 @@ export class GroupController {
     type: PaginatedtDto,
   })
   async addMemberToGroup(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Body() addMemberDto: AddMemberToGroupDto,
     @Req() request: any,
   ) {
@@ -144,8 +144,8 @@ export class GroupController {
     type: PaginatedtDto,
   })
   async removeMemberFromGroup(
-    @Param('groupId', ParseIntPipe) groupId: number,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('groupId') groupId: number,
+    @Param('userId') userId: number,
     @Req() request: any,
   ) {
     const userIdAuth = request.user.id;
@@ -161,7 +161,7 @@ export class GroupController {
     type: PaginatedtDto,
   })
   async updateGroup(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Body() updateGroupDto: UpdateGroupDto,
     @Req() request: any,
   ) {
@@ -178,7 +178,7 @@ export class GroupController {
     description: 'Delete group successfully',
   })
   async deleteGroup(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;
@@ -193,7 +193,7 @@ export class GroupController {
     description: 'Leave group successfully',
   })
   async leaveGroup(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;
@@ -209,7 +209,7 @@ export class GroupController {
     description: 'Message marked as read',
   })
   async markMessageAsRead(
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('messageId') messageId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;
@@ -224,7 +224,7 @@ export class GroupController {
     description: 'All messages in the chat marked as read',
   })
   async markAllMessagesAsRead(
-    @Param('groupId', ParseIntPipe) groupId: number,
+    @Param('groupId') groupId: number,
     @Req() request: any,
   ) {
     const userId = request.user.id;
