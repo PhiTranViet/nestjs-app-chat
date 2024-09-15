@@ -15,8 +15,8 @@ import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { getArrayPaginationBuildTotal } from '../../shared/Utils';
 import { CreateGroupDto } from './request/create-group.dto';
 import { SendMessageDto } from './request/send-message.dto';
-
-
+import { AddMemberToGroupDto } from './request/add-member-to-group.dto';
+import { UpdateGroupDto } from './request/update-group.dto';
 
 @Injectable()
 export class GroupService {
@@ -80,12 +80,12 @@ export class GroupService {
       throw Causes.DATA_INVALID;
     }
 
-    const messages = userGroups.map(userGroup => {
+    const messages = userGroups.map((userGroup) => {
       return this.messagesRepository.create({
         groupId: group.id,
         content: sendMessageToGroupDto.content,
         type: sendMessageToGroupDto.type,
-        userId: userGroup.userId, 
+        userId: userGroup.userId,
         isSender: userId == userGroup.userId ? true : false,
         status: 'sent',
         sentAt: Date.now(),
@@ -100,21 +100,21 @@ export class GroupService {
   async getMembersInGroup(paginationOptions: IPaginationOptions, data: any) {
     const queryBuilder = this.groupsRepository
       .createQueryBuilder('group')
-      .leftJoin(UserGroup,'ug','ug.groupId = group.id')
-      .leftJoin(User,'u','u.id = ug.userId')
+      .leftJoin(UserGroup, 'ug', 'ug.groupId = group.id')
+      .leftJoin(User, 'u', 'u.id = ug.userId')
       .select([
         'group.name AS name',
         'group.is_active AS isActive',
         'group.description AS description',
         'ug.role AS role',
-        'u.username as username'
+        'u.username as username',
       ]);
 
     const queryCount = this.groupsRepository
-    .createQueryBuilder('group')
-    .leftJoin(UserGroup,'ug','ug.groupId = group.id')
-    .leftJoin(User,'u','u.id = ug.userId')
-    .select('Count (1) as total');
+      .createQueryBuilder('group')
+      .leftJoin(UserGroup, 'ug', 'ug.groupId = group.id')
+      .leftJoin(User, 'u', 'u.id = ug.userId')
+      .select('Count (1) as total');
 
     // Todo: Filter
     const members = await queryBuilder.execute();
@@ -130,15 +130,14 @@ export class GroupService {
       results: items,
       pagination: meta,
     };
-
   }
 
   async getMessagesInGroup(paginationOptions: IPaginationOptions, data: any) {
-      const queryBuilder = this.messagesRepository
+    const queryBuilder = this.messagesRepository
       .createQueryBuilder('message')
-      .leftJoinAndSelect(Group,'g', 'message.groupId = g.id')
-      .leftJoin(UserGroup,'ug','ug.groupId = message.groupId')
-      .leftJoin(User,'u','u.id = ug.userId')
+      .leftJoinAndSelect(Group, 'g', 'message.groupId = g.id')
+      .leftJoin(UserGroup, 'ug', 'ug.groupId = message.groupId')
+      .leftJoin(User, 'u', 'u.id = ug.userId')
       .select([
         'm.type as typeMessage',
         'm.content as content',
@@ -148,22 +147,21 @@ export class GroupService {
         'm.delivered_at as deliveredAt',
         'm.attachment_url as attachmentUrl',
         'u.username as username',
-        'g.name as groupName'
+        'g.name as groupName',
       ])
-      .where('message.groupId = :groupId',{groupId:data.groupId})
-      .andWhere('message.userId = :userId',{userId:data.userId});
+      .where('message.groupId = :groupId', { groupId: data.groupId })
+      .andWhere('message.userId = :userId', { userId: data.userId });
 
-      const queryCount = this.messagesRepository
+    const queryCount = this.messagesRepository
       .createQueryBuilder('message')
-      .leftJoinAndSelect(Group,'g', 'message.groupId = g.id')
-      .leftJoin(UserGroup,'ug','ug.groupId = message.groupId')
-      .leftJoin(User,'u','u.id = ug.userId')
+      .leftJoinAndSelect(Group, 'g', 'message.groupId = g.id')
+      .leftJoin(UserGroup, 'ug', 'ug.groupId = message.groupId')
+      .leftJoin(User, 'u', 'u.id = ug.userId')
       .select('Count (1) as total')
-      .where('message.groupId = :groupId',{groupId:data.groupId})
-      .andWhere('message.userId = :userId',{userId:data.userId});
+      .where('message.groupId = :groupId', { groupId: data.groupId })
+      .andWhere('message.userId = :userId', { userId: data.userId });
 
-
-      // Todo: Filter
+    // Todo: Filter
     const messages = await queryBuilder.execute();
     const messagesCountList = await queryCount.execute();
 
@@ -177,25 +175,184 @@ export class GroupService {
       results: items,
       pagination: meta,
     };
-
-
   }
 
-  async addMemberToGroup(){
+  async addMemberToGroup(
+    userId: number,
+    groupId: number,
+    addMemberDto: AddMemberToGroupDto,
+  ): Promise<UserGroup> {
+    const group = await this.groupsRepository.findOne({
+      where: { id: groupId },
+    });
+    if (!group) {
+      throw Causes.DATA_INVALID;
+    }
 
+    const isAdmin = await this.checkIsAdminGroup(groupId, userId);
+    if (!isAdmin) {
+      throw Causes.DATA_INVALID;
+    }
+
+    const existingUserGroup = await this.usersGroupsRepository.findOne({
+      where: { groupId, userId: addMemberDto.userId },
+    });
+
+    if (existingUserGroup) {
+      throw Causes.DATA_INVALID;
+    }
+
+    const newUserGroup = this.usersGroupsRepository.create({
+      groupId,
+      userId: addMemberDto.userId,
+      role: addMemberDto.role,
+    });
+
+    return await this.usersGroupsRepository.save(newUserGroup);
   }
 
-  async removeMemberFromGroup(){
+  async removeMemberFromGroup(
+    groupId: number,
+    userId: number,
+    userIdAuth: number,
+  ): Promise<void> {
+    const group = await this.groupsRepository.findOne({
+      where: { id: groupId },
+    });
+    if (!group) {
+      throw Causes.DATA_INVALID;
+    }
 
+    const isAdmin = await this.checkIsAdminGroup(groupId, userIdAuth);
+    if (!isAdmin) {
+      throw Causes.DATA_INVALID;
+    }
+
+    const userGroup = await this.usersGroupsRepository.findOne({
+      where: { groupId, userId },
+    });
+
+    if (!userGroup) {
+      throw Causes.DATA_INVALID;
+    }
+
+    await this.usersGroupsRepository.remove(userGroup);
   }
 
-  async updateGroup(){
+  async updateGroup(
+    groupId: number,
+    userId: number,
+    updateGroupDto: UpdateGroupDto,
+  ): Promise<Group> {
+    const isAdmin = await this.checkIsAdminGroup(groupId, userId);
+    if (!isAdmin) {
+      throw Causes.DATA_INVALID;
+    }
 
+    const group = await this.groupsRepository.findOne({
+      where: { id: groupId },
+    });
+    if (!group) {
+      throw Causes.DATA_INVALID;
+    }
+
+    Object.assign(group, updateGroupDto);
+
+    return this.groupsRepository.save(group);
   }
 
-  async deleteGroup(){
+  async deleteGroup(
+    groupId: number,
+    userId: number,
+  ): Promise<{ message: string }> {
+    const isAdmin = await this.checkIsAdminGroup(groupId, userId);
+    if (!isAdmin) {
+      throw Causes.DATA_INVALID;
+    }
 
+    const group = await this.groupsRepository.findOne({
+      where: { id: groupId },
+    });
+
+    if (!group) {
+      throw Causes.DATA_INVALID;
+    }
+
+    await this.groupsRepository.delete(groupId);
+
+    return { message: 'Group deleted successfully' };
+  }
+
+  async leaveGroup(groupId: number, userId: number): Promise<void> {
+    const group = await this.groupsRepository.findOne({
+      where: { id: groupId },
+    });
+    if (!group) {
+      throw Causes.DATA_INVALID;
+    }
+
+    const userGroup = await this.usersGroupsRepository.findOne({
+      where: { groupId, userId },
+    });
+    if (!userGroup) {
+      throw Causes.DATA_INVALID;
+    }
+
+    const adminCount = await this.usersGroupsRepository.count({
+      where: { groupId, role: 'admin' },
+    });
+    if (userGroup.role === 'admin' && adminCount === 1) {
+      throw Causes.DATA_INVALID;
+    }
+
+    await this.usersGroupsRepository.remove(userGroup);
+  }
+
+  async checkIsAdminGroup(groupId: number, userId: number): Promise<boolean> {
+    const roleUserGroup = await this.usersGroupsRepository.findOne({
+      where: { groupId, userId: userId, role: 'admin' },
+    });
+
+    if (!roleUserGroup) {
+      return false;
+    }
+    return true;
   }
 
 
+
+  async markMessageAsRead(messageId: number, userId: number): Promise<Message> {
+    const message = await this.messagesRepository.findOne({
+      where: { id: messageId, userId: userId },
+    });
+
+    if (!message) {
+      throw Causes.DATA_INVALID;
+    }
+
+    message.status = 'read';
+    message.seenAt = Date.now();
+    await this.messagesRepository.save(message);
+
+    return message;
+  }
+
+  async markAllMessagesAsRead(groupId: number, userId: number): Promise<Message[]> {
+    const messages = await this.messagesRepository.find({
+      where: { groupId, status: 'sent', userId: userId   }, // Only mark messages that are 'sent'
+    });
+
+    if (!messages.length) {
+      throw Causes.DATA_INVALID;
+    }
+
+    messages.forEach(message => {
+      message.status = 'read';
+      message.seenAt = Date.now();
+    });
+
+    await this.messagesRepository.save(messages);
+
+    return messages;
+  }
 }
