@@ -137,3 +137,27 @@ export function encrypt(data: string) {
 export function convertToObject(value: any) {
   return typeof value === "object" ? value : {};
 }
+
+
+export function parseTTL(ttl: string): number {
+  const match = ttl.match(/^(\d+)([smhd])$/);
+  if (!match) {
+    throw new Error('Invalid TTL format');
+  }
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2];
+
+  switch (unit) {
+    case 's': // seconds
+      return value;
+    case 'm': // minutes
+      return value * 60;
+    case 'h': // hours
+      return value * 3600;
+    case 'd': // days
+      return value * 86400;
+    default:
+      throw new Error('Unsupported time unit');
+  }
+}

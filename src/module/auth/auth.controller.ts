@@ -179,9 +179,8 @@ export class AuthController {
     type: EmptyObjectBase,
   })
   async logout(@Req() request: any): Promise<EmptyObject> {
-    const token = request.headers.authorization;
     const userId = request.user.id;
-    this.authService.logout(token, userId);
+    this.authService.logout(userId);
     return new EmptyObject();
   }
 }

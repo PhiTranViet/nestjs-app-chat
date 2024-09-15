@@ -10,10 +10,10 @@ import { GroupGateway } from './module/group/group.gateway';
 import { GroupModule } from './module/group/group.module';
 import { WorkerService } from './module/worker/worker.service';
 import { RabbitMQModule } from './module/common/rabbitmq/rabbitmq.module';
-
+import { RedisModule } from './module/common/redis/redis.module';
 @Module({
   imports: [
-    ConfigModule.forRoot(), 
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -22,9 +22,17 @@ import { RabbitMQModule } from './module/common/rabbitmq/rabbitmq.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
-    }), AuthModule, PostModule, UserModule, ChatModule, NotificationModule, GroupModule,RabbitMQModule
+      synchronize: true,
+    }),
+    AuthModule,
+    PostModule,
+    UserModule,
+    ChatModule,
+    NotificationModule,
+    GroupModule,
+    RabbitMQModule,
+    RedisModule
   ],
-  providers: [GroupGateway,WorkerService],
+  providers: [GroupGateway, WorkerService],
 })
 export class AppModule {}

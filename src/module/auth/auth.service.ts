@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../../database/entities/User.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { encrypt, convertToObject } from '../../shared/Utils';
+import { encrypt, convertToObject, parseTTL } from '../../shared/Utils';
 import { LoginResponse } from './response/login.dto';
 import { Register } from './request/register.dto';
 import { Causes } from '../../config/exeption/causes';
+import { RedisService } from '../../module/common/redis/redis.service';
 
-var tokenMap = new Map();
 var limitRequestLoginMap = new Map();
 
 @Injectable()
@@ -22,6 +22,7 @@ export class AuthService {
     private dataSource: DataSource,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly redisService: RedisService,
   ) {}
 
   //login
@@ -111,6 +112,13 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: process.env.JWT_REFRESH_EXPIRED,
     });
+
+    await this.redisService.setToken(
+      user.id,
+      accessToken,
+      parseTTL(process.env.JWT_EXPIRED),
+    );
+
     await this.usersRepository.update(user.id, { refreshToken });
 
     return {
@@ -121,14 +129,21 @@ export class AuthService {
 
   async login(user: any): Promise<LoginResponse> {
     const payload = { username: user.username, userId: user.id };
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_EXPIRED,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_REFRESH_EXPIRED,
+    });
 
+    await this.redisService.setToken(
+      user.id,
+      accessToken,
+      parseTTL(process.env.JWT_EXPIRED),
+    );
     return {
-      accessToken: this.jwtService.sign(payload, {
-        expiresIn: process.env.JWT_EXPIRED,
-      }),
-      refreshToken: this.jwtService.sign(payload, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRED,
-      }),
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -215,10 +230,8 @@ export class AuthService {
     return user;
   }
 
-  async logout(token: string, userId: string) {
-    const tokenWithoutBearer = token.split(' ')[1];
-
-    this.deleteValidToken(tokenWithoutBearer);
+  async logout(userId: number) {
+    await this.redisService.deleteToken(Number(userId));
     await this.usersRepository.update(Number(userId), { refreshToken: null });
   }
 
@@ -240,13 +253,5 @@ export class AuthService {
 
   isValidToken(token: string) {
     return this.jwtService.verify(token);
-  }
-
-  setValidToken(token: string) {
-    tokenMap.set(encrypt(token), '1');
-  }
-
-  deleteValidToken(token: string) {
-    tokenMap.delete(encrypt(token));
   }
 }

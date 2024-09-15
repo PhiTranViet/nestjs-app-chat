@@ -10,6 +10,8 @@ import { PostService } from '../post/post.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User,Post } from '../../database/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisService } from '../../module/common/redis/redis.service';
+import { RedisModule } from '../../module/common/redis/redis.module';
 
 @Module({
   imports: [
@@ -29,9 +31,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
     UserModule,
+    RedisModule
   ],
-  providers: [AuthService, JwtStrategy, UserService,PostService],
+  providers: [AuthService, JwtStrategy, UserService,PostService,RedisService],
   controllers: [AuthController],
-  exports: [AuthService, UserService,JwtModule],
+  exports: [AuthService, UserService,JwtModule,RedisService],
 })
 export class AuthModule {}

@@ -1,14 +1,16 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { bool } from 'aws-sdk/clients/signer';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '../../module/common/redis/redis.service';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
+    private readonly redisService: RedisService
   ) {
     super();
   }
@@ -25,6 +27,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
       const user = this.jwtService.decode(token.split(' ')[1]);
       if (!user || !user['username']) return resolve(false);
+
+      const redisToken = await this.redisService.getToken(user.userId);
+      if (!redisToken || redisToken !== token.split(' ')[1]) {
+        return resolve(null);
+      }
+
 
       const userDB = await this.authService.getUserByUsername(user['username']);
       if (!userDB) return resolve(false);
