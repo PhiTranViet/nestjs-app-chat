@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Causes } from '../../config/exeption/causes';
 import { Post, User } from '../../database/entities';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreatePostDto } from './request/create-post.dto';
 import { UpdatePostDto } from './request/update-post.dto';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
@@ -11,8 +11,6 @@ import { getArrayPaginationBuildTotal } from '../../shared/Utils';
 @Injectable()
 export class PostService {
   constructor(
-    @InjectDataSource()
-    private dataSource: DataSource,
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
   ) {}

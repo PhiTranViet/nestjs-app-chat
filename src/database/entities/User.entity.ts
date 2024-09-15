@@ -21,6 +21,13 @@ export class User {
   @Column({name: 'refresh_token', type: 'varchar', length: 255, nullable: true})
   public refreshToken: string;
 
+
+  @Column({ name: 'profile_picture_url', type: 'varchar', length: 255, nullable: true })
+  public profilePictureUrl: string;
+
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  public isActive: boolean;
+
   @Column({ name: 'created_at', type: 'bigint', nullable: true })
   public createdAt: number;
 

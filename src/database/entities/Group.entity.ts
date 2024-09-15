@@ -10,6 +10,12 @@ export class Group {
   @Column({ name: 'name', type: 'varchar', length: 200 })
   public name: string;
 
+  @Column({ name: 'description', type: 'text', nullable: true })
+  public description: string;
+
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  public isActive: boolean;
+
   @Column({ name: 'created_at', type: 'bigint', nullable: true })
   public createdAt: number;
 

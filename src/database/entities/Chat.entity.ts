@@ -11,6 +11,9 @@ export class Chat {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   public name: string;
 
+  @Column({ name: 'is_group', type: 'boolean', default: false })
+  public isGroup: boolean;
+
   @Column({ name: 'created_at', type: 'bigint', nullable: true })
   public createdAt: number;
 
