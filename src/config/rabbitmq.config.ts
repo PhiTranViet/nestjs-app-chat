@@ -1,3 +1,3 @@
 export const rabbitMQConfig = {
-  uri: 'amqp://user:password@localhost:5672',
+  uri: process.env.RABBITMQ_URL,
 };

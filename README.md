@@ -23,23 +23,20 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-
 # Chat Application API
 
 This is a basic chat application backend built with **NestJS**, **PostgreSQL**, **Socket.IO**, and **Redis**. It includes user authentication, post creation, and a chat module supporting 1-1 and group chats. Swagger is used for API documentation.
 
-/* 
+----------------------------------------------------------------
   Topic: Create a new project
 
   - Basic authentication
   - Create a post, view the post list
   - Create a chat module (1-1, group)
   - Using Swagger to view the API list
-*/
+
 Tech: SocketIO, Nestjs, Docker, Redis, Postgresql, and anything else you can use. 
+----------------------------------------------------------------
 ## Features
 
 - **Authentication**: JWT-based authentication for users.
@@ -47,20 +44,37 @@ Tech: SocketIO, Nestjs, Docker, Redis, Postgresql, and anything else you can use
 - **Chat Module**: 1-1 and group chats powered by Socket.IO.
 - **API Documentation**: Swagger integrated for easy API exploration.
 
+![Authentication](https://github.com/PhiTranViet/nestjs-app-chat/blob/main/test/image/1.auth-user.png)
+![Post Management](https://github.com/PhiTranViet/nestjs-app-chat/blob/main/test/image/2.post.png)
+![Chat Module](https://github.com/PhiTranViet/nestjs-app-chat/blob/main/test/image/3.chat-group.png)
+
 ## Requirements
 
 - Node.js (>= v16.x)
 - Docker & Docker Compose (if using Docker)
 - PostgreSQL (if running manually)
 - Redis (if running manually)
+- RabbitMQ (if running manually)
 
 
+
+## Todo : Improvement work in the next version
+- Update flow message status changes
+- Update base unit-test
+- Microservices Architecture
+- Real-time Messaging
+- Caching
+- Media Storage
+- API Gateway
+- Bottlenecks and Resilience, Shared Storage
+- Kafka
+......................	
 ## Getting Started
 
 ### 1. Clone the Repository
 
-git clone https://github.com/PhiTranViet/project-app.git
-cd project-app
+git clone https://github.com/PhiTranViet/nestjs-app-chat.git
+cd nestjs-app-chat
 
 ### 2. Environment Configuration
 Create a .env file in the project root directory and add the following variables:
@@ -81,6 +95,12 @@ JWT_SECRET=your_jwt_secret
 # App
 APP_PORT=3000
 
+
+```bash
+# watch mode
+$ npm install
+$ npm run start:dev
+```
 
 ### 3. Running with Docker
 
@@ -197,23 +217,11 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+
+# test socket-io client
+cd ../test/socket-client/websocket-client.js
+node websocket-client.js
 ```
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
 

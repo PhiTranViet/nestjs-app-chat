@@ -52,7 +52,6 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: password123
       DB_NAME: chat_app
-      SECRET_KEY: somesercretkey
       JWT_SECRET: somesercretkey
       JWT_EXPIRED: 15m
       JWT_REFRESH_EXPIRED: 7d
@@ -62,6 +61,9 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USER: user
       RABBITMQ_PASS: password
+      RABBITMQ_URL: amqp://user:password@rabbitmq:5672
+      SOCKET_PORT: 4000
+      REDIS_URL: redis://redis:6379
     volumes:
       - .:/usr/src/app
     networks:
